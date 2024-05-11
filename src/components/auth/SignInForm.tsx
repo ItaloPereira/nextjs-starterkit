@@ -1,57 +1,63 @@
 'use client';
 
-import Avatar from '@mui/material/Avatar';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+
+import Link from '@/components/ui/Link';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { authenticate } from '@/actions/auth';
+import { signIn_ } from '@/actions/auth';
 
 
 const SignInForm = () => {
-  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+  const [errors, action] = useFormState(signIn_, undefined);
 
   return (
-    <>
-      <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-        <LockOutlinedIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5">
-        Entrar
-      </Typography>
-      <Box component="form" action={dispatch} noValidate sx={{ mt: 1 }}>
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email"
-          name="email"
-          autoComplete="email"
-          autoFocus
-        />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Senha"
-          type="password"
-          id="password"
-          autoComplete="current-password"
-        />
+    <Box component="form" action={action} noValidate sx={{ mt: 1 }}>
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="email"
+        label="Email"
+        name="email"
+        autoComplete="email"
+        autoFocus
+        size='small'
+        error={!!errors?.email}
+        helperText={errors?.email?._errors[0]}
+      />
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        name="password"
+        label="Password"
+        type="password"
+        id="password"
+        autoComplete="current-password"
+        size='small'
+        error={!!errors?.password}
+        helperText={errors?.password?._errors[0]}
+      />
 
-        <SignInButton />
+      <SignInButton />
 
-        {errorMessage && (
-          <Alert severity="error">{errorMessage}</Alert>
-        )}
-      </Box>
-    </>
+      {/* {errorMessage && (
+        <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>
+      )} */}
+
+      <Grid container justifyContent="flex-end">
+        <Grid item>
+          <Link href="/auth/sign-up" variant="body2">
+            {"Don't have an account? Sign Up"}
+          </Link>
+        </Grid>
+      </Grid>
+    </Box>
   )
 }
 
@@ -66,7 +72,7 @@ const SignInButton = () => {
       variant="contained"
       sx={{ mt: 3, mb: 2 }}
     >
-      Entrar
+      Sign In
     </LoadingButton>
   )
 }
