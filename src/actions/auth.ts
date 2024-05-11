@@ -30,7 +30,10 @@ export async function signIn_(prevState: any, formData: FormData) {
   });
 
   if (error) {
-    return error.format();
+    return {
+      ...error.format(),
+      general: null
+    };
   }
 
   const user = await getUser(data.email);
@@ -40,6 +43,8 @@ export async function signIn_(prevState: any, formData: FormData) {
       general: {
         _errors: ['Invalid Credentials']
       },
+      email: null,
+      password: null,
     };
   }
 
@@ -54,7 +59,9 @@ export async function signIn_(prevState: any, formData: FormData) {
   return {
     general: {
       _errors: ['Invalid Credentials']
-    }
+    },
+    email: null,
+    password: null,
   };
 }
 
