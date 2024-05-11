@@ -1,32 +1,12 @@
 'use server';
 
 import { signIn, signOut as authSignOut } from '@/auth';
-import { AuthError } from 'next-auth';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { redirect } from 'next/navigation';
 import type { User } from '@/types/user';
 import { revalidatePath } from 'next/cache';
-
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  try {
-    await signIn('credentials', formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid Credentials';
-        default:
-          return 'Internal Error';
-      }
-    }
-    throw error;
-  }
-}
 
 async function getUser(email: string): Promise<User | undefined> {
   try {
@@ -55,11 +35,27 @@ export async function signIn_(prevState: any, formData: FormData) {
 
   const user = await getUser(data.email);
 
-  if (!user) return null;
+  if (!user) {
+    return {
+      general: {
+        _errors: ['Invalid Credentials']
+      },
+    };
+  }
 
   const passwordsMatch = await bcrypt.compare(data.password, user.password);
 
-  if (passwordsMatch) await signIn('credentials', user);
+  if (passwordsMatch) {
+    await signIn('credentials', user);
+    revalidatePath('/dashboard/home');
+    return redirect('/dashboard/home');
+  } 
+
+  return {
+    general: {
+      _errors: ['Invalid Credentials']
+    }
+  };
 }
 
 const SignUpFormSchema = z.object({
@@ -93,7 +89,7 @@ export async function signUp(prevState: any, formData: FormData) {
   }
 
   await signIn_(null, formData);
-  
+
 }
 
 export async function signOut() {

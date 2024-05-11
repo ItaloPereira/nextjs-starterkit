@@ -46,9 +46,9 @@ const SignInForm = () => {
 
       <SignInButton />
 
-      {/* {errorMessage && (
-        <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>
-      )} */}
+      {errors?.general && (
+        <Alert severity="error" sx={{ mb: 2 }}>{errors?.general?._errors[0]}</Alert>
+      )}
 
       <Grid container justifyContent="flex-end">
         <Grid item>

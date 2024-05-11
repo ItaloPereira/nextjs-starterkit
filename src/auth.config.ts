@@ -1,4 +1,5 @@
 import type { NextAuthConfig, DefaultSession } from 'next-auth';
+import { redirect } from 'next/navigation';
 
 declare module 'next-auth' {
   interface Session {
