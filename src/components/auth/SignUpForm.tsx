@@ -4,6 +4,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
 
 import Link from '@/components/ui/Link';
 
@@ -74,6 +75,10 @@ const SignUpForm = () => {
       </Grid>
 
       <SignUpButton />
+
+      {errors?.general && (
+        <Alert severity="error" sx={{ mb: 2 }}>{errors?.general?._errors[0]}</Alert>
+      )}
 
       <Grid container justifyContent="flex-end">
         <Grid item>

@@ -5,11 +5,11 @@ import NextLink from 'next/link';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import Alert from '@mui/material/Alert';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
@@ -24,6 +24,7 @@ const CreateEventForm = () => {
 
   return (
     <Paper elevation={2} sx={{ padding: 2 }}>
+      <Typography mb={2} variant="h6" component="h2">Event Information</Typography>
       <Box component="form" action={action} noValidate>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>

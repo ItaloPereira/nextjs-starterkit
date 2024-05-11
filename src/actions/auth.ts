@@ -5,18 +5,8 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { redirect } from 'next/navigation';
-import type { User } from '@/types/user';
 import { revalidatePath } from 'next/cache';
-
-async function getUser(email: string): Promise<User | undefined> {
-  try {
-    const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
-    return user.rows[0];
-  } catch (error) {
-    console.error('Failed to fetch user:', error);
-    throw new Error('Failed to fetch user.');
-  }
-}
+import { getUser } from '@/data/user';
 
 const SignInFormSchema = z.object({
   email: z.string().email('Invalid Email').min(5, 'Invalid Email'),
@@ -73,6 +63,14 @@ const SignUpFormSchema = z.object({
 });
 
 export async function signUp(prevState: any, formData: FormData) {
+  const defaultErrors = {
+    first_name: null,
+    last_name: null,
+    email: null,
+    password: null,
+    general: null,
+  }
+
   const { data, error } = SignUpFormSchema.safeParse({
     first_name: formData.get('first_name'),
     last_name: formData.get('last_name'),
@@ -81,7 +79,19 @@ export async function signUp(prevState: any, formData: FormData) {
   });
 
   if (error) {
-    return error.format();
+    return {
+      ...defaultErrors,
+      ...error.format(),
+    }
+  }
+
+  const user = await getUser(data.email);
+
+  if (user) return {
+    ...defaultErrors,
+    general: {
+      _errors: ['User with this email already exists.']
+    },
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -92,11 +102,10 @@ export async function signUp(prevState: any, formData: FormData) {
       VALUES (${data.first_name}, ${data.last_name}, ${data.email}, ${hashedPassword})
     `;
   } catch (error) {
-    throw new Error('Database Error: Error creating event');
+    throw new Error(`Database Error: ${error}`);
   }
 
   await signIn_(null, formData);
-
 }
 
 export async function signOut() {
